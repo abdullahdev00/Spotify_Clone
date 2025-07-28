@@ -12,6 +12,13 @@
 </head>
 
 <body>
+     <script>
+        // Check if this is first visit
+        if (!sessionStorage.getItem('loaded')) {
+            sessionStorage.setItem('loaded', 'true');
+            window.location.href = 'loading.html';
+        }
+    </script>
 
     <div class="container bg-black flex">
         <div class="left  bg-black ">

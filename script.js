@@ -1,8 +1,30 @@
 const currentsong = new Audio();
-let songs;
+let songs = []; // ✅ Initialize as empty array instead of undefined
 let currentFolder;
 let ul = document.querySelector(".songlist ul");
 let noData = document.getElementById("noData");
+
+// ✅ Wait for DOM to load before selecting elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements should be selected after DOM is loaded
+    window.play = document.getElementById("play");
+    window.previous = document.getElementById("previous");
+    window.next = document.getElementById("next");
+    
+    console.log("DOM loaded, elements:", {
+        play: window.play,
+        previous: window.previous, 
+        next: window.next
+    });
+    
+    // Remove the main() call from here since it's now in DOMContentLoaded
+// main();
+});
+
+// ✅ Remove these from global scope since we'll set them after DOM loads
+// const play = document.getElementById("play");
+// const previous = document.getElementById("previous");
+// const next = document.getElementById("next");
 
 function formatTime(seconds) {
     if (isNaN(seconds)) return "00:00";
@@ -26,19 +48,23 @@ function cleanFilename(filename) {
 
 async function getsongs(folder) {
     currentFolder = folder;
+    console.log("Getting songs for folder:", folder);
+    
     let a = await fetch(`http://127.0.0.1:3000/${folder}/`);
     let response = await a.text();
     let div = document.createElement("div");
     div.innerHTML = response;
     let as = div.getElementsByTagName("a");
 
-    songs = [];
+    songs = []; // ✅ Reset global songs array
     for (let index = 0; index < as.length; index++) {
         const element = as[index];
         if (element.href.endsWith(".mp3")) {
             songs.push(element.href.split(`/${folder}/`)[1]);
         }
     }
+    
+    console.log("Songs found in", folder, ":", songs);
 
     let songul = document.querySelector(".songlist").getElementsByTagName("ul")[0];
     songul.innerHTML = ""; // clear old songs
@@ -46,7 +72,8 @@ async function getsongs(folder) {
     // Show/hide noData Lottie
     if (songs.length === 0) {
         noData.style.display = "block";
-        return;
+        console.log("No songs found, showing noData");
+        return songs; // ✅ Return empty array
     } else {
         noData.style.display = "none";
         // Reset all song icons to play by default
@@ -54,7 +81,6 @@ async function getsongs(folder) {
             btn.src = "images/playbtnbar.svg";
         });
     }
-
 
     for (const song of songs) {
         let cleanedName = cleanFilename(song);
@@ -70,7 +96,10 @@ async function getsongs(folder) {
         </li>`;
     }
 
-    playMusic(songs[0], true);
+    // ✅ Load first song but don't play it automatically
+    if (songs.length > 0) {
+        playMusic(songs[0], true);
+    }
 
     // attach event listener to each song item
     document.querySelectorAll(".songlist li").forEach(li => {
@@ -81,31 +110,35 @@ async function getsongs(folder) {
             if (currentsong.src.includes(filename)) {
                 if (currentsong.paused) {
                     currentsong.play();
-                    play.src = "images/pause.svg";
-                    // li.querySelector(".playnow-btn").src = "images/pause.svg";issue
-                    
-                    } else {
-                        currentsong.pause();
-                        play.src = "images/playbtnbar.svg";
-                        li.querySelector(".playnow-btn").src = "images/playbtnbar.svg";
-                    }
-            } else {
-                    playMusic(filename); // new song
+                    window.play.src = "images/pause.svg";
+                    // ✅ Update clicked li button to pause
+                    li.querySelector(".playnow-btn").src = "images/pause.svg";
+                } else {
+                    currentsong.pause();
+                    window.play.src = "images/playbtnbar.svg";
+                    // ✅ Update clicked li button to play
+                    li.querySelector(".playnow-btn").src = "images/playbtnbar.svg";
                 }
+            } else {
+                playMusic(filename); // new song
+            }
 
-                // Update SVGs of other list items
-                document.querySelectorAll(".songlist li").forEach(otherLi => {
-                    const btn = otherLi.querySelector(".playnow-btn");
-                    if (otherLi !== li) {
-                        otherLi.classList.remove("playing");
-                        btn.src = "images/playbtnbar.svg";
-                    }
-                });
+            // Update SVGs of other list items
+            document.querySelectorAll(".songlist li").forEach(otherLi => {
+                const btn = otherLi.querySelector(".playnow-btn");
+                if (otherLi !== li) {
+                    otherLi.classList.remove("playing");
+                    btn.src = "images/playbtnbar.svg";
+                }
             });
+        });
     });
-
+    
+    console.log("Returning songs:", songs);
+    return songs; // ✅ Return the songs array
 }
 
+// ✅ Fixed playMusic function with correct pause logic
 const playMusic = (track, pause = false) => {
     currentsong.pause();
     currentsong.src = `/${currentFolder}/` + track;
@@ -117,11 +150,13 @@ const playMusic = (track, pause = false) => {
         document.querySelector(".songtime").innerHTML = `${currentTime} / ${duration}`;
     }, { once: true });
 
+    // ✅ Fixed logic - if pause is true, don't play
     if (!pause) {
         currentsong.play();
-        play.src = "images/pause.svg";
+        window.play.src = "images/pause.svg";
     } else {
-        play.src = "images/playbtnbar.svg";
+        // ✅ If paused, show play button
+        window.play.src = "images/playbtnbar.svg";
     }
 
     let cleanedName = cleanFilename(track);
@@ -140,7 +175,8 @@ const playMusic = (track, pause = false) => {
         let btn = li.querySelector(".playnow-btn");
         if (li.getAttribute("data-filename") === track) {
             li.classList.add("playing");
-            btn.src = "images/pause.svg";
+            // ✅ Show correct button based on play state
+            btn.src = pause ? "images/playbtnbar.svg" : "images/pause.svg";
         } else {
             li.classList.remove("playing");
             btn.src = "images/playbtnbar.svg";
@@ -149,6 +185,7 @@ const playMusic = (track, pause = false) => {
 };
 
 async function displayAlbum() {
+    console.log("Loading albums...");
     let a = await fetch(`http://127.0.0.1:3000/songs/`);
     let response = await a.text();
     let div = document.createElement("div");
@@ -156,10 +193,14 @@ async function displayAlbum() {
 
     let anchors = div.getElementsByTagName("a");
     let cardContainer = document.querySelector(".cardContainer");
+    cardContainer.innerHTML = ""; // ✅ Clear existing cards
 
+    let loadedCards = 0;
     for (let anchor of anchors) {
-        if (anchor.href.includes("/songs")) {
+        if (anchor.href.includes("/songs") && !anchor.href.endsWith("/songs/")) {
             let folder = anchor.href.split("/").slice(-2)[0];
+            console.log("Processing folder:", folder);
+            
             try {
                 let metadataRes = await fetch(`http://127.0.0.1:3000/songs/${folder}/info.json`);
                 let metadata = await metadataRes.json();
@@ -173,33 +214,111 @@ async function displayAlbum() {
                         <h2>${metadata.title}</h2>
                         <p class="ellipsise">${metadata.description}</p>
                     </div>`;
+                
+                loadedCards++;
+                console.log("Loaded card for folder:", folder);
             } catch (error) {
-                console.error(`Metadata error: ${folder}`, error);
+                console.error(`Metadata error for ${folder}:`, error);
+                
+                // ✅ Add card even without metadata
+                cardContainer.innerHTML += `
+                    <div data-folder="${folder}" class="card">
+                        <div class="circle-container">
+                            <img class="svg" src="/images/play.svg" alt="">
+                        </div>
+                        <img src="/songs/${folder}/cover.jpg" alt="songsjpg" onerror="this.src='/images/default-cover.jpg'">
+                        <h2>${folder.replace(/_/g, ' ')}</h2>
+                        <p class="ellipsise">Music Collection</p>
+                    </div>`;
+                
+                loadedCards++;
             }
         }
     }
+    
+    console.log("Total cards loaded:", loadedCards);
+    return loadedCards;
 }
 
 async function main() {
-    songs = await getsongs("songs/cs");
-
-    await displayAlbum();
-
-    const firstCard = document.querySelector(`.card[data-folder="Angry_(mood)"]`);
-    if (firstCard) {
-        firstCard.classList.add("active");
+    // ✅ Try to load songs from a folder that actually exists
+    console.log("Starting main function...");
+    
+    // First try to get available folders
+    try {
+        let a = await fetch(`http://127.0.0.1:3000/songs/`);
+        let response = await a.text();
+        let div = document.createElement("div");
+        div.innerHTML = response;
+        let anchors = div.getElementsByTagName("a");
+        
+        let availableFolders = [];
+        for (let anchor of anchors) {
+            if (anchor.href.includes("/songs") && !anchor.href.endsWith("/songs/")) {
+                let folder = anchor.href.split("/").slice(-2)[0];
+                availableFolders.push(folder);
+            }
+        }
+        
+        console.log("Available folders:", availableFolders);
+        
+        // ✅ Load songs from first available folder instead of hardcoded "songs/cs"
+        if (availableFolders.length > 0) {
+            const firstFolder = availableFolders[0];
+            console.log("Loading songs from first available folder:", firstFolder);
+            songs = await getsongs(`songs/${firstFolder}`);
+        } else {
+            console.log("No folders found, loading empty songs");
+            songs = [];
+        }
+        
+    } catch (error) {
+        console.error("Error loading folders:", error);
+        // Fallback to original logic
+        songs = await getsongs("songs/cs");
     }
 
-    play.addEventListener("click", () => {
+    console.log("Initial songs loaded:", songs);
+
+    // ✅ Load albums first, then load songs from first available folder
+    const cardsLoaded = await displayAlbum();
+    
+    // ✅ If no songs loaded initially, try to load from first card
+    if ((!songs || songs.length === 0) && cardsLoaded > 0) {
+        const firstCard = document.querySelector('.card');
+        if (firstCard) {
+            const firstFolder = firstCard.dataset.folder;
+            console.log("No initial songs, loading from first card folder:", firstFolder);
+            songs = await getsongs(`songs/${firstFolder}`);
+            firstCard.classList.add("active");
+        }
+    } else {
+        // ✅ Activate the first card that matches loaded songs
+        let firstCard = document.querySelector('.card');
+        if (firstCard) {
+            firstCard.classList.add("active");
+            console.log("Activated first card:", firstCard.dataset.folder);
+        }
+    }
+
+    // ✅ Debug: Check if elements exist
+    console.log("Play element:", window.play);
+    console.log("Previous element:", window.previous);
+    console.log("Next element:", window.next);
+    console.log("Songs array after loading:", songs);
+
+    // ✅ Main play button event listener
+    if (window.play) {
+        window.play.addEventListener("click", () => {
         if (currentsong.paused) {
             currentsong.play();
-            play.src = "images/pause.svg";
+            window.play.src = "images/pause.svg";
         } else {
             currentsong.pause();
-            play.src = "images/playbtnbar.svg";
+            window.play.src = "images/playbtnbar.svg";
         }
 
-        // toggle icons in playlist
+        // ✅ Update playlist icons when main play button is clicked
         document.querySelectorAll(".songlist li").forEach(li => {
             const isCurrent = li.getAttribute("data-filename") === currentsong.src.split("/").pop();
             const btn = li.querySelector(".playnow-btn");
@@ -233,7 +352,14 @@ async function main() {
     });
 
     currentsong.addEventListener("ended", () => {
-        play.src = "images/playbtnbar.svg";
+        window.play.src = "images/playbtnbar.svg";
+        // ✅ Also update playlist button when song ends
+        document.querySelectorAll(".songlist li").forEach(li => {
+            const isCurrent = li.getAttribute("data-filename") === currentsong.src.split("/").pop();
+            if (isCurrent) {
+                li.querySelector(".playnow-btn").src = "images/playbtnbar.svg";
+            }
+        });
     });
 
     document.querySelector(".hamburger").addEventListener("click", () => {
@@ -253,26 +379,100 @@ async function main() {
         }, 1500);
     }
 
-    previous.addEventListener("click", () => {
-        let index = songs.indexOf(currentsong.src.split("/").pop());
-        if ((index - 1) >= 0) {
-            playMusic(songs[index - 1]);
-        } else {
-            setTimeout(() => showToast("⏮️ You're already on the first song!"), 500);
-        }
-    });
+    // ✅ Previous button event listener - with proper error handling
+    if (window.previous) {
+        window.previous.addEventListener("click", () => {
+            console.log("Previous clicked");
+            console.log("Songs array:", songs);
+            console.log("Current song src:", currentsong.src);
+            
+            // ✅ Check if songs array exists and has items
+            if (!songs || songs.length === 0) {
+                console.error("Songs array is empty or undefined");
+                console.error("Current songs variable:", songs);
+                console.error("Type of songs:", typeof songs);
+                console.error("Current folder:", currentFolder);
+                showToast("⚠️ No songs loaded!");
+                return;
+            }
+            
+            // ✅ Check if current song is playing
+            if (!currentsong.src) {
+                console.error("No current song");
+                showToast("⚠️ No song is currently loaded!");
+                return;
+            }
+            
+            let currentSongName = currentsong.src.split("/").pop();
+            let index = songs.indexOf(currentSongName);
+            
+            console.log("Current song name:", currentSongName);
+            console.log("Current index:", index);
+            
+            if (index === -1) {
+                console.error("Current song not found in songs array");
+                showToast("⚠️ Current song not found in playlist!");
+                return;
+            }
+            
+            if ((index - 1) >= 0) {
+                playMusic(songs[index - 1]);
+            } else {
+                setTimeout(() => showToast("⏮️ You're already on the first song!"), 500);
+            }
+        });
+    } else {
+        console.error("Previous button not found!");
+    }
 
-    next.addEventListener("click", () => {
-        let index = songs.indexOf(currentsong.src.split("/").pop());
-        if ((index + 1) < songs.length) {
-            playMusic(songs[index + 1]);
-        } else {
-            setTimeout(() => {
-                showToast("⏭️ You're already on the last song! Starting again...");
-                playMusic(songs[0]);
-            }, 500);
-        }
-    });
+    // ✅ Next button event listener - with proper error handling
+    if (window.next) {
+        window.next.addEventListener("click", () => {
+            console.log("Next clicked");
+            console.log("Songs array:", songs);
+            console.log("Current song src:", currentsong.src);
+            
+            // ✅ Check if songs array exists and has items
+            if (!songs || songs.length === 0) {
+                console.error("Songs array is empty or undefined");
+                console.error("Current songs variable:", songs);
+                console.error("Type of songs:", typeof songs);
+                console.error("Current folder:", currentFolder);
+                showToast("⚠️ No songs loaded!");
+                return;
+            }
+            
+            // ✅ Check if current song is playing
+            if (!currentsong.src) {
+                console.error("No current song");
+                showToast("⚠️ No song is currently loaded!");
+                return;
+            }
+            
+            let currentSongName = currentsong.src.split("/").pop();
+            let index = songs.indexOf(currentSongName);
+            
+            console.log("Current song name:", currentSongName);
+            console.log("Current index:", index);
+            
+            if (index === -1) {
+                console.error("Current song not found in songs array");
+                showToast("⚠️ Current song not found in playlist!");
+                return;
+            }
+            
+            if ((index + 1) < songs.length) {
+                playMusic(songs[index + 1]);
+            } else {
+                setTimeout(() => {
+                    showToast("⏭️ You're already on the last song! Starting again...");
+                    playMusic(songs[0]);
+                }, 500);
+            }
+        });
+    } else {
+        console.error("Next button not found!");
+    }
 
     document.querySelector(".cardContainer").addEventListener("click", async (event) => {
         let card = event.target.closest(".card");
@@ -280,9 +480,16 @@ async function main() {
             document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
             card.classList.add("active");
             let folder = card.dataset.folder;
-            songs = await getsongs(`songs/${folder}`);
+            console.log("Switching to folder:", folder);
+            
+            // ✅ Properly wait for and assign songs
+            const newSongs = await getsongs(`songs/${folder}`);
+            songs = newSongs; // ✅ Ensure global songs is updated
+            
+            console.log("New songs loaded and assigned:", songs);
+            console.log("Global songs variable:", songs);
         }
     });
 }
-
+}
 main();

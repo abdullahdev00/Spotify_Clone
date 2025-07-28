@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Clone - Loading</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Skeleton Animation */
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        /* Left Sidebar Skeleton */
+        .left {
+            width: 25vw;
+            height: 98%;
+            padding: 10px 5px;
+        }
+
+        .home-skeleton {
+            background-color: #121212;
+            border-radius: 7px;
+            padding: 14px;
+            margin: 5px;
+        }
+
+        .logo-skeleton {
+            width: 80px;
+            height: 24px;
+            margin-bottom: 20px;
+        }
+
+        .nav-item-skeleton {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        .nav-icon-skeleton {
+            width: 20px;
+            height: 20px;
+        }
+
+        .nav-text-skeleton {
+            width: 60px;
+            height: 16px;
+        }
+
+        .library-skeleton {
+            background-color: #121212;
+            border-radius: 7px;
+            padding: 14px;
+            margin: 5px;
+            height: 80vh;
+            position: relative;
+        }
+
+        .library-header-skeleton {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .library-icon-skeleton {
+            width: 16px;
+            height: 16px;
+        }
+
+        .library-title-skeleton {
+            width: 100px;
+            height: 16px;
+        }
+
+        .song-item-skeleton {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin: 10px 0;
+            background-color: #1F1F1F;
+            border-radius: 4px;
+        }
+
+        .song-icon-skeleton {
+            width: 20px;
+            height: 20px;
+        }
+
+        .song-name-skeleton {
+            flex: 1;
+            height: 16px;
+        }
+
+        .song-play-skeleton {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Right Main Area Skeleton */
+        .right {
+            width: 75vw;
+            height: 98%;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content-skeleton {
+            background-color: #121212;
+            border-radius: 7px;
+            padding: 14px;
+            margin: 5px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-skeleton {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-buttons-skeleton {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-button-skeleton {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .auth-buttons-skeleton {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-button-skeleton {
+            width: 80px;
+            height: 32px;
+            border-radius: 16px;
+        }
+
+        .trending-title-skeleton {
+            width: 150px;
+            height: 24px;
+            margin-bottom: 20px;
+        }
+
+        .cards-container-skeleton {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+
+        .card-skeleton {
+            width: 175px;
+            padding: 8px;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .card-skeleton:hover {
+            background-color: #1e1e1e;
+        }
+
+        .card-image-skeleton {
+            width: 159px;
+            height: 159px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .card-title-skeleton {
+            width: 120px;
+            height: 16px;
+            margin-bottom: 8px;
+        }
+
+        .card-description-skeleton {
+            width: 100px;
+            height: 14px;
+        }
+
+        /* Playbar Skeleton */
+        .playbar-skeleton {
+            background-color: #121212;
+            border-radius: 7px;
+            padding: 14px;
+            margin: 5px;
+            position: fixed;
+            bottom: 0;
+            width: 71vw;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .playbar-content-skeleton {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .song-info-skeleton {
+            flex: 1;
+            height: 20px;
+            max-width: 200px;
+        }
+
+        .play-controls-skeleton {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .control-button-skeleton {
+            width: 24px;
+            height: 24px;
+        }
+
+        .play-button-skeleton {
+            width: 32px;
+            height: 32px;
+        }
+
+        .time-info-skeleton {
+            flex: 1;
+            height: 16px;
+            max-width: 80px;
+        }
+
+        .seekbar-skeleton {
+            width: 95%;
+            height: 4px;
+            border-radius: 2px;
+            margin: 0 auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .left {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .right {
+                width: 100vw;
+            }
+            
+            .playbar-skeleton {
+                width: 90vw;
+            }
+            
+            .cards-container-skeleton {
+                justify-content: center;
+            }
+            
+            .card-skeleton {
+                width: calc(50% - 10px);
+                min-width: 140px;
+            }
+        }
+
+        /* Loading dots animation */
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            margin: 20px 0;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #1db954;
+            border-radius: 50%;
+            animation: loadingDots 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes loadingDots {
+            0%, 80%, 100% {
+                transform: scale(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Spotify green accent */
+        .accent-skeleton {
+            background: linear-gradient(90deg, #1db954 25%, #1ed760 50%, #1db954 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Pulse animation for play button */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar Skeleton -->
+        <div class="left">
+            <!-- Home Section -->
+            <div class="home-skeleton">
+                <div class="skeleton logo-skeleton"></div>
+                
+                <div class="nav-item-skeleton">
+                    <div class="skeleton nav-icon-skeleton"></div>
+                    <div class="skeleton nav-text-skeleton"></div>
+                </div>
+                
+                <div class="nav-item-skeleton">
+                    <div class="skeleton nav-icon-skeleton"></div>
+                    <div class="skeleton nav-text-skeleton"></div>
+                </div>
+            </div>
+
+            <!-- Library Section -->
+            <div class="library-skeleton">
+                <div class="library-header-skeleton">
+                    <div class="skeleton library-icon-skeleton"></div>
+                    <div class="skeleton library-title-skeleton"></div>
+                </div>
+
+                <!-- Song List Skeleton -->
+                <div class="song-item-skeleton">
+                    <div class="skeleton song-icon-skeleton"></div>
+                    <div class="skeleton song-name-skeleton"></div>
+                    <div class="skeleton song-play-skeleton"></div>
+                </div>
+
+                <div class="song-item-skeleton">
+                    <div class="skeleton song-icon-skeleton"></div>
+                    <div class="skeleton song-name-skeleton"></div>
+                    <div class="skeleton song-play-skeleton"></div>
+                </div>
+
+                <div class="song-item-skeleton">
+                    <div class="skeleton song-icon-skeleton"></div>
+                    <div class="skeleton song-name-skeleton"></div>
+                    <div class="skeleton song-play-skeleton"></div>
+                </div>
+
+                <div class="song-item-skeleton">
+                    <div class="skeleton song-icon-skeleton"></div>
+                    <div class="skeleton song-name-skeleton"></div>
+                    <div class="skeleton song-play-skeleton"></div>
+                </div>
+
+                <div class="song-item-skeleton">
+                    <div class="skeleton song-icon-skeleton"></div>
+                    <div class="skeleton song-name-skeleton"></div>
+                    <div class="skeleton song-play-skeleton"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Main Area -->
+        <div class="right">
+            <div class="main-content-skeleton">
+                <!-- Header -->
+                <div class="header-skeleton">
+                    <div class="nav-buttons-skeleton">
+                        <div class="skeleton nav-button-skeleton"></div>
+                        <div class="skeleton nav-button-skeleton"></div>
+                        <div class="skeleton nav-button-skeleton"></div>
+                    </div>
+                    
+                    <div class="auth-buttons-skeleton">
+                        <div class="skeleton auth-button-skeleton"></div>
+                        <div class="skeleton auth-button-skeleton"></div>
+                    </div>
+                </div>
+
+                <!-- Trending Section -->
+                <div class="skeleton trending-title-skeleton"></div>
+
+                <!-- Loading Animation -->
+                <div class="loading-dots">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+
+                <!-- Cards Container -->
+                <div class="cards-container-skeleton">
+                    <!-- Card 1 -->
+                    <div class="card-skeleton">
+                        <div class="skeleton card-image-skeleton"></div>
+                        <div class="skeleton card-title-skeleton"></div>
+                        <div class="skeleton card-description-skeleton"></div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="card-skeleton">
+                        <div class="skeleton card-image-skeleton"></div>
+                        <div class="skeleton card-title-skeleton"></div>
+                        <div class="skeleton card-description-skeleton"></div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="card-skeleton">
+                        <div class="skeleton card-image-skeleton"></div>
+                        <div class="skeleton card-title-skeleton"></div>
+                        <div class="skeleton card-description-skeleton"></div>
+                    </div>
+
+                    <!-- Card 4 -->
+                    <div class="card-skeleton">
+                        <div class="skeleton card-image-skeleton"></div>
+                        <div class="skeleton card-title-skeleton"></div>
+                        <div class="skeleton card-description-skeleton"></div>
+                    </div>
+
+                    <!-- Card 5 -->
+                    <div class="card-skeleton">
+                        <div class="skeleton card-image-skeleton"></div>
+                        <div class="skeleton card-title-skeleton"></div>
+                        <div class="skeleton card-description-skeleton"></div>
+                    </div>
+
+                    <!-- Card 6 -->
+                    <div class="card-skeleton">
+                        <div class="skeleton card-image-skeleton"></div>
+                        <div class="skeleton card-title-skeleton"></div>
+                        <div class="skeleton card-description-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Playbar Skeleton -->
+            <div class="playbar-skeleton">
+                <div class="playbar-content-skeleton">
+                    <div class="skeleton song-info-skeleton"></div>
+                    
+                    <div class="play-controls-skeleton">
+                        <div class="skeleton control-button-skeleton"></div>
+                        <div class="skeleton accent-skeleton play-button-skeleton pulse"></div>
+                        <div class="skeleton control-button-skeleton"></div>
+                    </div>
+                    
+                    <div class="skeleton time-info-skeleton"></div>
+                </div>
+                
+                <div class="skeleton accent-skeleton seekbar-skeleton"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ✅ After 3 seconds, redirect to main page
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 3000);
+    </script>
+</body>
+</html>
