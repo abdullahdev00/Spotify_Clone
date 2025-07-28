@@ -1,0 +1,82 @@
+.red-border{
+    border: 1px solid red;
+    margin: 3px;
+}
+
+.flex{
+    display: flex;
+}
+.justify-center{
+    justify-content: center;
+}
+.item-center{
+    align-items: center;
+}
+
+.bg-black{
+    background-color: black;
+    color: white;
+}
+
+.invert{
+    filter: invert(1);
+}
+
+.bg-gray{
+    background-color: #121212;
+}
+.rounded{
+    border-radius: 7px;
+}
+.m1{
+    margin: 5px;
+}
+.p1{
+    padding: 0.875rem;
+}
+
+/* WebKit Browsers */
+.cardContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cardContainer::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.cardContainer::-webkit-scrollbar-thumb {
+  background-color: #898989;
+  border-radius: 4px;
+}
+
+/* ✅ Remove up/down arrows completely */
+.cardContainer::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+/* Firefox */
+.cardContainer {
+  scrollbar-width: thin;
+  scrollbar-color: #898989 #1a1a1a;
+}
+
+.ellipsise {
+  display: -webkit-box;               /* for WebKit (Chrome, Safari) */
+  display: box;                       /* older fallback */
+  display: flexbox;                   /* older fallback */
+  display: -moz-box;                  /* Firefox older fallback */
+  display: -ms-flexbox;               /* IE 10 fallback */
+
+  -webkit-line-clamp: 2;              /* WebKit version */
+  line-clamp: 2;                      /* Standard version */
+  
+  -webkit-box-orient: vertical;       /* Required for webkit-line-clamp */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card.active {
+  border: 2px solid white;
+}
+

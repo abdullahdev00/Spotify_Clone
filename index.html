@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="utility.css">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container bg-black flex">
+        <div class="left  bg-black ">
+            <div class="home p1 bg-gray rounded m1">
+                <div class="rightupper flex">
+                    <div class="logo"> <img class="invert" src="images/logo.svg" alt="logo"></div>
+                    <div class="close">
+                        <img src="/images/close.svg" alt="close">
+                    </div>
+                </div>
+
+
+                <ul>
+                    <li>
+                        <img class="invert" src="images/home.svg" alt="Home">Home
+                    </li>
+                    <li>
+                        <img class="invert" src="images/search.svg" alt="Search">Search
+                    </li>
+                </ul>
+            </div>
+            <div class="library p1 bg-gray rounded m1 ">
+                <div class="heading flex">
+                    <img class="invert" src="images/playlist.svg" alt="playlist">
+                    <h2>Your Library</h2>
+                </div>
+                <div class="songlist">
+                    <div id="noData" class="center-content" style="display:none; text-align: center; padding: 2rem;">
+                        <lottie-player
+                            src="/assets/No-Data.json"
+                            background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay>
+                        </lottie-player>
+                        <p style="color:white;">No songs found in this folder</p>
+                    </div>
+                    <ul>
+
+                    </ul>
+                </div>
+                <div class="footer ">
+                    <div>
+                        <a href="https://www.spotify.com/pk-en/legal/">Legal</a>
+                    </div>
+                    <div>
+                        <a href="https://www.spotify.com/pk-en/safetyandprivacy/">Safety & Privacy Center</a>
+                    </div>
+                    <div>
+                        <a href="https://www.spotify.com/pk-en/legal/privacy-policy/">Privacy Policy</a>
+                    </div>
+                    <div>
+                        <a href="https://www.spotify.com/pk-en/legal/cookies-policy/">Cookies</a>
+                    </div>
+                    <div>
+                        <a href="https://www.spotify.com/pk-en/legal/privacy-policy/#s3">About Ads</a>
+                    </div>
+                    <div>
+                        <a href="https://www.spotify.com/pk-en/accessibility/">Accessibility</a>
+                    </div>
+                    <div>
+                        <div><a href="#">Cookies</a></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="right bg-black flex ">
+            <div class="rightinner  m1 p1 bg-gray rounded flex ">
+                <div class="header">
+                    <div class="nav flex ">
+                        <div class="hamburger">
+                            <img src="/images/hamburger.svg" alt="hamburger">
+                        </div>
+                        <img src="/images/leftArrow.svg" alt="leftArrow">
+                        <img src="/images/rightArrow.svg" alt="righta\Arrow">
+                    </div>
+                    <div class="button">
+                        <button class="signupbtn">Sign up</button>
+                        <button class="loginbtn">Log In</button>
+                    </div>
+                </div>
+                <div class="lowersection ">
+                    <div class="trending h2">Trending songs</div>
+                    <div class="cardContainer flex">
+                        <!-- <div data-folder="ncs" class="card">
+                            <div class="circle-container">
+                                <img class="svg" src="/images/play.svg" alt="">
+                            </div>
+                            <img src="/images/cover.jpeg" alt="songs">
+                            <h2>Saiyaara (From Saiyaara)</h2>
+                            <p >
+                                Tanishk Bagchi Faheem Abdullah Arslan Nizami
+                            </p>
+                        </div>
+                        <div data-folder="cs" class="card">
+                            <div class="circle-container">
+                                <img class="svg" src="/images/play.svg" alt="">
+                            </div>
+                            <img src="/images/cover.jpeg" alt="songs">
+                            <h2>Saiyaara (From Saiyaara)</h2>
+                            <p>
+                                Tanishk Bagchi Faheem Abdullah Arslan Nizami
+                            </p>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="playbar flex bg-gray p1 m1 rounded ">
+                <div class="abovebar flex">
+                    <div class="songinfo">
+                        <div class="scroll-wrapper">
+                            <div class="scrolling-text">
+                                <span>${cleanedName}</span>
+                                <span class="gap"></span>
+                                <span>${cleanedName}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="playbutton flex">
+                        <img id="previous" src="/images/prevsong.svg" alt="prevbtn">
+                        <img id="play" src="/images/playbtnbar.svg" alt="playbtn">
+                        <img id="next" src="/images/nextsong.svg" alt="nextbtn">
+                    </div>
+                    <div class="songtime"> </div>
+                </div>
+                <div class="seekbar">
+                    <div class="progress"></div>
+                    <div class="circle"> </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+    <div id="toast"
+        style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #333; color: white; padding: 10px 20px; border-radius: 5px; z-index: 999;">
+        You're already on the first song!</div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
