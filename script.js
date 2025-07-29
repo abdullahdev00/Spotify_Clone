@@ -6,18 +6,18 @@ let ul = document.querySelector(".songlist ul");
 let noData = document.getElementById("noData");
 
 // ✅ Wait for DOM to load before selecting elements
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Elements should be selected after DOM is loaded
     window.play = document.getElementById("play");
     window.previous = document.getElementById("previous");
     window.next = document.getElementById("next");
-    
+
     console.log("DOM loaded, elements:", {
         play: window.play,
-        previous: window.previous, 
+        previous: window.previous,
         next: window.next
     });
-    
+
     // Call main() after DOM is loaded
     main();
 });
@@ -46,16 +46,16 @@ function cleanFilename(filename) {
 async function getsongs(folder) {
     currentFolder = folder;
     console.log("Getting songs for folder:", folder);
-    
+
     try {
         // ✅ Try to load from info.json first (if it exists)
         let response = await fetch(`${baseBlobUrl}/${folder}/info.json`);
-        
+
         if (response.ok) {
             // ✅ If info.json exists, use it
             let albumInfo = await response.json();
             console.log("Found info.json for", folder, ":", albumInfo);
-            
+
             songs = [];
             if (albumInfo.songs && Array.isArray(albumInfo.songs)) {
                 for (let song of albumInfo.songs) {
@@ -69,11 +69,11 @@ async function getsongs(folder) {
             console.log("No info.json found, trying directory listing...");
             let dirResponse = await fetch(`${baseBlobUrl}/${folder}/`);
             let dirText = await dirResponse.text();
-            
+
             let div = document.createElement("div");
             div.innerHTML = dirText;
             let links = div.getElementsByTagName("a");
-            
+
             songs = [];
             for (let i = 0; i < links.length; i++) {
                 let href = links[i].href;
@@ -87,7 +87,7 @@ async function getsongs(folder) {
         console.error("Error loading songs from", folder, ":", error);
         songs = [];
     }
-    
+
     console.log("Songs found in", folder, ":", songs);
 
     let songul = document.querySelector(".songlist").getElementsByTagName("ul")[0];
@@ -156,7 +156,7 @@ async function getsongs(folder) {
             });
         });
     });
-    
+
     console.log("Returning songs:", songs);
     return songs;
 }
@@ -164,7 +164,7 @@ async function getsongs(folder) {
 // ✅ FIXED: Updated playMusic function with better metadata handling
 const playMusic = (track, pause = false) => {
     console.log("🎵 Playing:", track, "Pause:", pause);
-    
+
     currentsong.pause();
     currentsong.src = `${baseBlobUrl}/${currentFolder}/${track}`;
     currentsong.load();
@@ -174,21 +174,21 @@ const playMusic = (track, pause = false) => {
         let currentTime = formatTime(currentsong.currentTime);
         let duration = formatTime(currentsong.duration);
         let songtimeElement = document.querySelector(".songtime");
-        
+
         if (songtimeElement) {
             songtimeElement.innerHTML = `${currentTime} / ${duration}`;
         }
-        
+
         console.log("Song info updated:", currentTime, "/", duration);
     }
-    
+
     // Try to update immediately if metadata is already loaded
     if (currentsong.duration && !isNaN(currentsong.duration)) {
         updateSongInfo();
     } else {
         // Wait for metadata to load
         currentsong.addEventListener("loadedmetadata", updateSongInfo, { once: true });
-        
+
         // Fallback timeout in case metadata doesn't load
         setTimeout(() => {
             if (currentsong.duration && !isNaN(currentsong.duration)) {
@@ -246,34 +246,34 @@ const playMusic = (track, pause = false) => {
 const AZURE_BASE = "https://spotifyclone.blob.core.windows.net/songs";
 async function loadAlbums() {
     console.log("Loading albums from Azure...");
-    
+
     // ✅ You can either hardcode known albums or try to discover them
-    let albums = ["Angry_(mood)", "Bright_(mood)"]; // Add more as needed
-    
+    let albums = ["Angry_(mood)", "Bright_(mood)", "Diljit"]; // Add more as needed
+
     for (let album of albums) {
         try {
             console.log(`Checking album: ${album}`);
-            
+
             // ✅ Try to load info.json for this album
             let response = await fetch(`${AZURE_BASE}/${album}/info.json`);
-            
+
             if (response.ok) {
                 let albumInfo = await response.json();
                 console.log(`✅ Loaded album info for ${album}:`, albumInfo);
-                
+
                 // ✅ You can use this info to display album cards or details
                 // This is just for verification - the actual UI cards are created in displayAlbum()
             } else {
                 console.log(`ℹ️ No info.json found for ${album}, will try direct loading`);
             }
-            
+
         } catch (err) {
             console.error(`❌ Error checking album "${album}":`, err);
         }
     }
 }
 
-// ✅ FIXED: Simplified displayAlbum function
+// ✅ FIXED: Corrected displayAlbum function
 async function displayAlbum() {
     console.log("Creating album cards...");
     
@@ -285,21 +285,64 @@ async function displayAlbum() {
     
     cardContainer.innerHTML = ""; // Clear existing cards
     
-    // ✅ Create cards for known albums
-    let albums = [
-        {
-            folder: "Angry_(mood)",
-            title: "Angry Mood",
-            description: "Bring your angry mood up",
-            cover: "cover.jpg"
-        },
-        {
-            folder: "Bright_(mood)", 
-            title: "Bright Mood",
-            description: "Brighten up your day",
-            cover: "cover.jpg"
+    // ✅ Fetch albums from your Azure storage
+    let albums = [];
+
+    try {
+        // ✅ Use your correct base URL instead of placeholder
+        let res = await fetch(`${baseBlobUrl}/songs/albums/albums.json`);
+        
+        if (res.ok) {
+            albums = await res.json();
+            console.log("✅ Albums loaded from albums.json:", albums);
+        } else {
+            console.log("ℹ️ albums.json not found, using fallback albums");
+            // ✅ Fallback to hardcoded albums if albums.json doesn't exist
+            albums = [
+                {
+                    folder: "Angry_(mood)",
+                    title: "Angry Mood",
+                    description: "Intense and powerful tracks",
+                    cover: "cover.jpg"
+                },
+                {
+                    folder: "Bright_(mood)", 
+                    title: "Bright Mood",
+                    description: "Uplifting and energetic songs",
+                    cover: "cover.jpg"
+                },
+                {
+                    folder: "Diljit",
+                    title: "Diljit Collection",
+                    description: "Best of Diljit Dosanjh",
+                    cover: "cover.jpg"
+                }
+            ];
         }
-    ];
+    } catch (error) {
+        console.error("❌ Error fetching albums:", error);
+        // ✅ Use fallback albums on any error
+        albums = [
+            {
+                folder: "Angry_(mood)",
+                title: "Angry Mood", 
+                description: "Intense and powerful tracks",
+                cover: "cover.jpg"
+            },
+            {
+                folder: "Bright_(mood)",
+                title: "Bright Mood",
+                description: "Uplifting and energetic songs", 
+                cover: "cover.jpg"
+            },
+            {
+                folder: "Diljit",
+                title: "Diljit Collection",
+                description: "Best of Diljit Dosanjh",
+                cover: "cover.jpg"
+            }
+        ];
+    }
     
     let cardsCreated = 0;
     
@@ -334,22 +377,22 @@ async function displayAlbum() {
 // ✅ FIXED: Main function with proper error handling
 async function main() {
     console.log("🚀 Starting main function...");
-    
+
     // ✅ First load the album cards
     const cardsLoaded = await displayAlbum();
     console.log(`Cards loaded: ${cardsLoaded}`);
-    
+
     // ✅ Then try to load songs from the first available album
     if (cardsLoaded > 0) {
         const firstCard = document.querySelector('.card');
         if (firstCard) {
             const firstFolder = firstCard.dataset.folder;
             console.log(`Loading songs from first album: ${firstFolder}`);
-            
+
             // ✅ Load songs and wait for completion
             songs = await getsongs(`songs/${firstFolder}`);
             firstCard.classList.add("active");
-            
+
             console.log(`✅ Loaded ${songs.length} songs from ${firstFolder}`);
         }
     } else {
@@ -394,11 +437,11 @@ async function main() {
     // Remove any existing listeners first
     currentsong.removeEventListener("loadedmetadata", handleLoadedMetadata);
     currentsong.removeEventListener("timeupdate", handleTimeUpdate);
-    
+
     // ✅ Define seeking state at proper scope
     let isManuallySeking = false;
     let seekTarget = 0;
-    
+
     // Define handlers outside to avoid duplicates
     function handleLoadedMetadata() {
         let currentTime = formatTime(currentsong.currentTime);
@@ -409,36 +452,36 @@ async function main() {
         }
         console.log("Metadata loaded - Duration:", duration);
     }
-    
+
     function handleTimeUpdate() {
         // ✅ Check seeking states to prevent conflicts
         if (currentsong.seeking || isManuallySeking) {
             console.log("⏸️ Skipping timeupdate - seeking in progress");
             return; // Don't update UI while seeking
         }
-        
+
         if (currentsong.duration && !isNaN(currentsong.duration) && currentsong.duration > 0) {
             let percent = (currentsong.currentTime / currentsong.duration) * 100;
             let currentTime = formatTime(currentsong.currentTime);
             let duration = formatTime(currentsong.duration);
-            
+
             // Update time display
             let songtimeElement = document.querySelector(".songtime");
             if (songtimeElement) {
                 songtimeElement.innerHTML = `${currentTime} / ${duration}`;
             }
-            
+
             // Update progress bar only if not currently seeking
             let circleElement = document.querySelector(".circle");
             let progressElement = document.querySelector(".progress");
-            
+
             if (circleElement && progressElement) {
                 circleElement.style.left = percent + "%";
                 progressElement.style.width = percent + "%";
             }
         }
     }
-    
+
     // Add the event listeners
     currentsong.addEventListener("loadedmetadata", handleLoadedMetadata);
     currentsong.addEventListener("timeupdate", handleTimeUpdate);
@@ -448,33 +491,33 @@ async function main() {
     if (seekbarElement) {
         // Remove existing listener if any
         seekbarElement.removeEventListener("click", handleSeekbarClick);
-        
+
         function handleSeekbarClick(e) {
             console.log("🎯 Seekbar clicked!");
-            
+
             // ✅ Check if song is loaded and ready
             if (!currentsong.src) {
                 console.log("❌ No song loaded");
                 return;
             }
-            
+
             if (!currentsong.duration || isNaN(currentsong.duration) || currentsong.duration === 0) {
                 console.log("❌ Song duration not available:", currentsong.duration);
                 return;
             }
-            
+
             let seekbar = e.currentTarget;
             let rect = seekbar.getBoundingClientRect();
             let clickX = e.clientX - rect.left;
             let percent = (clickX / rect.width) * 100;
-            
+
             // Clamp percent between 0 and 100
             percent = Math.max(0, Math.min(100, percent));
-            
+
             // Calculate new time
             let newTime = (currentsong.duration * percent) / 100;
             seekTarget = newTime;
-            
+
             console.log("📊 Seek Details:", {
                 clickX: clickX,
                 seekbarWidth: rect.width,
@@ -486,46 +529,46 @@ async function main() {
                 seekableLength: currentsong.seekable.length,
                 seekableRange: currentsong.seekable.length > 0 ? `${currentsong.seekable.start(0)}-${currentsong.seekable.end(0)}` : "none"
             });
-            
+
             // ✅ AZURE WORKAROUND: For non-seekable streams, we reload with fragment
             if (currentsong.seekable.length === 0 || currentsong.seekable.end(0) === 0) {
                 console.log("🔄 Azure stream not seekable, using fragment workaround");
-                
+
                 // Store current play state
                 let wasPlaying = !currentsong.paused;
                 let currentSrc = currentsong.src;
-                
+
                 // ✅ Set manual seeking flag
                 isManuallySeking = true;
                 currentsong.removeEventListener("timeupdate", handleTimeUpdate);
-                
+
                 // ✅ Update UI immediately
                 updateProgressBar(percent, newTime);
-                
+
                 // ✅ AZURE FRAGMENT WORKAROUND: Add time fragment to URL
                 let fragmentUrl = `${currentSrc}#t=${newTime}`;
                 console.log("🎬 Loading with time fragment:", fragmentUrl);
-                
+
                 // ✅ Pause current song
                 currentsong.pause();
-                
+
                 // ✅ Set new source with time fragment
                 currentsong.src = fragmentUrl;
                 currentsong.load();
-                
+
                 // ✅ Handle metadata loaded for fragment
                 let fragmentLoadHandler = () => {
                     console.log("📊 Fragment loaded, duration:", currentsong.duration);
-                    
+
                     // Set currentTime as close as possible to target
                     if (currentsong.duration && newTime < currentsong.duration) {
                         currentsong.currentTime = newTime;
                         console.log("⏰ Set currentTime to:", newTime, "Actual:", currentsong.currentTime);
                     }
-                    
+
                     // Update display
                     updateProgressBar(percent, newTime);
-                    
+
                     // Resume playback if it was playing
                     if (wasPlaying) {
                         currentsong.play().then(() => {
@@ -534,24 +577,24 @@ async function main() {
                             console.error("❌ Error playing fragment:", err);
                         });
                     }
-                    
+
                     // Re-enable timeupdate
                     setTimeout(() => {
                         isManuallySeking = false;
                         currentsong.addEventListener("timeupdate", handleTimeUpdate);
                         console.log("🔄 Timeupdate re-enabled after fragment load");
                     }, 1000);
-                    
+
                     currentsong.removeEventListener("loadedmetadata", fragmentLoadHandler);
                 };
-                
+
                 currentsong.addEventListener("loadedmetadata", fragmentLoadHandler);
-                
+
                 // ✅ Fallback if metadata doesn't load
                 setTimeout(() => {
                     if (isManuallySeking) {
                         console.log("⚠️ Fragment timeout, falling back to direct seek");
-                        
+
                         // Try direct currentTime set
                         try {
                             currentsong.currentTime = newTime;
@@ -559,58 +602,58 @@ async function main() {
                         } catch (err) {
                             console.error("❌ Direct seek also failed:", err);
                         }
-                        
+
                         // Force enable timeupdate
                         isManuallySeking = false;
                         currentsong.addEventListener("timeupdate", handleTimeUpdate);
                         currentsong.removeEventListener("loadedmetadata", fragmentLoadHandler);
                     }
                 }, 3000);
-                
+
                 return; // Exit early for fragment approach
             }
-            
+
             // ✅ NORMAL SEEKABLE STREAM HANDLING (original code)
             let wasPlaying = !currentsong.paused;
-            
+
             isManuallySeking = true;
             currentsong.removeEventListener("timeupdate", handleTimeUpdate);
-            
+
             try {
                 // Force immediate visual update BEFORE seeking
                 updateProgressBar(percent, newTime);
-                
+
                 // Set currentTime
                 currentsong.currentTime = newTime;
-                
+
                 console.log("✅ Set currentTime to:", newTime, "Actual:", currentsong.currentTime);
-                
+
                 // Enhanced seek completion handler
                 let seekCompleteHandler = () => {
                     console.log("✅ Normal seek completed at:", formatTime(currentsong.currentTime));
-                    
+
                     // Verify position
                     if (Math.abs(currentsong.currentTime - seekTarget) > 2) {
                         console.log("⚠️ Position mismatch, correcting...");
                         currentsong.currentTime = seekTarget;
                     }
-                    
+
                     // Restore play state
                     if (wasPlaying && currentsong.paused) {
                         currentsong.play();
                     }
-                    
+
                     // Re-enable timeupdate
                     setTimeout(() => {
                         isManuallySeking = false;
                         currentsong.addEventListener("timeupdate", handleTimeUpdate);
                     }, 500);
-                    
+
                     currentsong.removeEventListener("seeked", seekCompleteHandler);
                 };
-                
+
                 currentsong.addEventListener("seeked", seekCompleteHandler);
-                
+
                 // Fallback timeout
                 setTimeout(() => {
                     if (isManuallySeking) {
@@ -620,52 +663,52 @@ async function main() {
                         currentsong.removeEventListener("seeked", seekCompleteHandler);
                     }
                 }, 2000);
-                
+
             } catch (error) {
                 console.error("❌ Error during normal seeking:", error);
                 isManuallySeking = false;
                 currentsong.addEventListener("timeupdate", handleTimeUpdate);
             }
         }
-        
+
         // ✅ Helper function to update progress bar
         function updateProgressBar(percent, currentTime) {
             let circleElement = document.querySelector(".circle");
             let progressElement = document.querySelector(".progress");
             let songtimeElement = document.querySelector(".songtime");
-            
+
             if (circleElement && progressElement) {
                 circleElement.style.left = percent + "%";
                 progressElement.style.width = percent + "%";
             }
-            
+
             if (songtimeElement && currentsong.duration) {
                 let current = formatTime(currentTime);
                 let duration = formatTime(currentsong.duration);
                 songtimeElement.innerHTML = `${current} / ${duration}`;
             }
         }
-        
+
         seekbarElement.addEventListener("click", handleSeekbarClick);
-        
+
         // ✅ Enhanced seeking event listeners for Azure streams
         currentsong.addEventListener("seeking", () => {
             console.log("🔄 Seeking to:", formatTime(currentsong.currentTime));
         });
-        
+
         currentsong.addEventListener("seeked", () => {
             console.log("✅ Native seek completed at:", formatTime(currentsong.currentTime));
         });
-        
+
         // ✅ Handle loading states for Azure streams
         currentsong.addEventListener("waiting", () => {
             console.log("⏳ Azure stream buffering...");
         });
-        
+
         currentsong.addEventListener("canplay", () => {
             console.log("▶️ Azure stream ready to play");
         });
-        
+
     } else {
         console.error("❌ Seekbar element not found!");
     }
@@ -705,20 +748,20 @@ async function main() {
                 showToast("⚠️ No songs loaded!");
                 return;
             }
-            
+
             if (!currentsong.src) {
                 showToast("⚠️ No song is currently loaded!");
                 return;
             }
-            
+
             let currentSongName = currentsong.src.split("/").pop();
             let index = songs.indexOf(currentSongName);
-            
+
             if (index === -1) {
                 showToast("⚠️ Current song not found in playlist!");
                 return;
             }
-            
+
             if ((index - 1) >= 0) {
                 playMusic(songs[index - 1]);
             } else {
@@ -734,20 +777,20 @@ async function main() {
                 showToast("⚠️ No songs loaded!");
                 return;
             }
-            
+
             if (!currentsong.src) {
                 showToast("⚠️ No song is currently loaded!");
                 return;
             }
-            
+
             let currentSongName = currentsong.src.split("/").pop();
             let index = songs.indexOf(currentSongName);
-            
+
             if (index === -1) {
                 showToast("⚠️ Current song not found in playlist!");
                 return;
             }
-            
+
             if ((index + 1) < songs.length) {
                 playMusic(songs[index + 1]);
             } else {
@@ -762,26 +805,26 @@ async function main() {
         let card = event.target.closest(".card");
         if (card) {
             console.log("🎵 Card clicked:", card.dataset.folder);
-            
+
             // Update active card
             document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
             card.classList.add("active");
-            
+
             let folder = card.dataset.folder;
             console.log(`Switching to folder: ${folder}`);
-            
+
             // ✅ Load songs from selected folder and wait for completion
             try {
                 const newSongs = await getsongs(`songs/${folder}`);
                 songs = newSongs; // Update global songs array
-                
+
                 console.log(`✅ Successfully loaded ${songs.length} songs from ${folder}`);
                 console.log("New songs:", songs);
-                
+
                 if (songs.length === 0) {
                     showToast("⚠️ No songs found in this album!");
                 }
-                
+
             } catch (error) {
                 console.error(`❌ Error loading songs from ${folder}:`, error);
                 showToast("❌ Error loading songs from this album!");
@@ -789,6 +832,6 @@ async function main() {
             }
         }
     });
-    
+
     console.log("✅ Main function completed successfully!");
 }

@@ -1,0 +1,32 @@
+[
+    {
+        "folder": "Angry_(mood)",
+        "title": "Angry Mood",
+        "description": "Bring your angry mood up",
+        "cover": "cover.jpg"
+    },
+    {
+        "folder": "Bright_(mood)",
+        "title": "Bright Mood",
+        "description": "Brighten up your day",
+        "cover": "cover.jpg"
+    },
+    {
+        "folder": "Diljit",
+        "title": "Diljit",
+        "description": "Songs by Diljit in Punjabi",
+        "cover": "cover.jpg"
+    },
+    {
+        "folder": "Qari_Alafasy",
+        "title": "Qari Alafasy",
+        "description": "Recitation of Holy Quran by Qari Alafasy",
+        "cover": "cover.jpg"
+    },
+    {
+        "folder": "Uplifting_(mood)",
+        "title": "Uplifting Mood",
+        "description": "Its time to uplift your mood",
+        "cover": "cover.jpg"
+    }
+]

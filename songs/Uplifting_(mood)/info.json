@@ -1,4 +1,10 @@
 {
   "title":"Uplifiting Mood",
-  "description": "Uplift your mood"
+  "description": "Uplift your mood",
+  "songs":[
+    {
+      "title":"Farming___Laddi_Chahal_ft_Parmish_Verma___Mahira___Gurlej_Akhtar__Desi_Crew___New_Punjabi_Songs_2021(256k)",
+      "file":"Farming___Laddi_Chahal_ft_Parmish_Verma___Mahira___Gurlej_Akhtar__Desi_Crew___New_Punjabi_Songs_2021(256k).mp3"
+    }
+  ]
 }
